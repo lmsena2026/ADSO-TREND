@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { Plus, Pencil, Trash2, X, Search } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
@@ -46,6 +47,12 @@ export default function AdminProducts() {
   }, []);
 
   const slugify = (s: string) => s.toLowerCase().trim().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-');
+
+  // Formatea una cadena de dígitos como pesos colombianos con puntos de miles (ej: 80000 -> "80.000")
+  const formatCOP = (digits: string) => {
+    if (!digits) return '';
+    return Number(digits).toLocaleString('es-CO');
+  };
 
   const openNew = () => {
     setForm({ ...emptyForm });
@@ -169,7 +176,7 @@ export default function AdminProducts() {
                       </div>
                     </td>
                     <td className="px-4 py-3 text-ink-600">{cat?.name ?? '—'}</td>
-                    <td className="px-4 py-3 font-semibold">${p.price.toFixed(2)}</td>
+                    <td className="px-4 py-3 font-semibold">${p.price.toLocaleString('es-CO')}</td>
                     <td className="px-4 py-3">
                       <span className={p.stock < 10 ? 'text-amber-600' : 'text-ink-600'}>{p.stock}</span>
                     </td>
@@ -216,11 +223,31 @@ export default function AdminProducts() {
               </div>
               <div>
                 <label className="mb-1 block text-sm font-medium text-ink-700">Precio</label>
-                <input type="number" step="0.01" className="input-field" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} />
+                <div className="relative">
+                  <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-500">$</span>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    className="input-field pl-7"
+                    value={formatCOP(form.price)}
+                    onChange={(e) => setForm({ ...form, price: e.target.value.replace(/\D/g, '') })}
+                    placeholder="0"
+                  />
+                </div>
               </div>
               <div>
                 <label className="mb-1 block text-sm font-medium text-ink-700">Precio antes (descuento)</label>
-                <input type="number" step="0.01" className="input-field" value={form.compare_at_price} onChange={(e) => setForm({ ...form, compare_at_price: e.target.value })} />
+                <div className="relative">
+                  <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-500">$</span>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    className="input-field pl-7"
+                    value={formatCOP(form.compare_at_price)}
+                    onChange={(e) => setForm({ ...form, compare_at_price: e.target.value.replace(/\D/g, '') })}
+                    placeholder="0"
+                  />
+                </div>
               </div>
               <div>
                 <label className="mb-1 block text-sm font-medium text-ink-700">Categoría</label>
