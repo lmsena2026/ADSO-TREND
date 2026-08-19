@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { Plus, Pencil, Trash2, X, Search } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
