@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { Search, Heart, ShoppingBag, User, Menu, X, LayoutDashboard } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
@@ -20,6 +20,13 @@ export default function Navbar() {
   const { user, profile, signOut, isAdmin } = useAuth();
   const { count } = useCart();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const isCategoryActive = (to: string) => {
+    const targetCategoria = new URLSearchParams(to.split('?')[1]).get('categoria')?.toLowerCase();
+    const currentCategoria = new URLSearchParams(location.search).get('categoria')?.toLowerCase();
+    return location.pathname === '/catalogo' && targetCategoria === currentCategoria;
+  };
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -74,7 +81,9 @@ export default function Navbar() {
               <NavLink
                 key={link.label}
                 to={link.to}
-                className="text-sm font-medium text-ink-700 transition-colors hover:text-ink-950"
+                className={`text-sm font-medium transition-colors hover:text-ink-950 ${
+                  isCategoryActive(link.to) ? 'text-ink-950 underline underline-offset-4' : 'text-ink-700'
+                }`}
               >
                 {link.label}
               </NavLink>
@@ -171,7 +180,9 @@ export default function Navbar() {
                   key={link.label}
                   to={link.to}
                   onClick={() => setMobileOpen(false)}
-                  className="rounded-lg px-4 py-3 text-base font-medium text-ink-800 transition-colors hover:bg-ink-50"
+                  className={`rounded-lg px-4 py-3 text-base font-medium transition-colors hover:bg-ink-50 ${
+                    isCategoryActive(link.to) ? 'bg-ink-50 text-ink-950' : 'text-ink-800'
+                  }`}
                 >
                   {link.label}
                 </NavLink>
