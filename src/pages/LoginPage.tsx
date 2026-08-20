@@ -71,11 +71,6 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <div className="mt-6 rounded-xl bg-ink-50 p-4 text-center text-sm">
-          <p className="font-medium text-ink-700">Cuenta de administrador:</p>
-          <p className="mt-1 text-ink-500">admin@adsotrend.com · admin123456</p>
-        </div>
-
         <p className="mt-6 text-center text-sm text-ink-500">
           ¿No tienes cuenta?{' '}
           <Link to="/signup" className="font-semibold text-ink-950 underline">Regístrate</Link>
