@@ -38,8 +38,8 @@ export default function CatalogPage() {
     let result = [...products];
 
     if (categorySlug) {
-      const cat = categories.find((c) => c.slug === categorySlug);
-      if (cat) result = result.filter((p) => p.category_id === cat.id);
+      const cat = categories.find((c) => c.slug.toLowerCase() === categorySlug.toLowerCase());
+      result = cat ? result.filter((p) => p.category_id === cat.id) : [];
     }
 
     if (query) {
@@ -80,7 +80,7 @@ export default function CatalogPage() {
     return result;
   }, [products, categories, categorySlug, query, priceRange, selectedSizes, selectedColors, sortBy]);
 
-  const activeCategory = categories.find((c) => c.slug === categorySlug);
+  const activeCategory = categories.find((c) => c.slug.toLowerCase() === categorySlug.toLowerCase());
 
   const toggleArray = (arr: string[], value: string, setter: (v: string[]) => void) => {
     setter(arr.includes(value) ? arr.filter((v) => v !== value) : [...arr, value]);
@@ -120,7 +120,7 @@ export default function CatalogPage() {
             key={c.id}
             onClick={() => setCategory(c.slug)}
             className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
-              categorySlug === c.slug ? 'bg-ink-950 text-white' : 'bg-ink-100 text-ink-700 hover:bg-ink-200'
+              categorySlug.toLowerCase() === c.slug.toLowerCase() ? 'bg-ink-950 text-white' : 'bg-ink-100 text-ink-700 hover:bg-ink-200'
             }`}
           >
             {c.name}
