@@ -18,7 +18,7 @@ export default function CatalogPage() {
 
   const categorySlug = searchParams.get('categoria') ?? '';
   const query = searchParams.get('q') ?? '';
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 200]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000000]);
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
 
@@ -253,7 +253,8 @@ function FilterContent({
         <input
           type="range"
           min={0}
-          max={200}
+          max={1000000}
+          step={10000}
           value={priceRange[1]}
           onChange={(e) => setPriceRange([priceRange[0], Number(e.target.value)])}
           className="mt-3 w-full accent-ink-950"
