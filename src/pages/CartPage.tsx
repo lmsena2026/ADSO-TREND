@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Minus, Plus, Trash2, ShoppingBag, ArrowRight } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { FREE_SHIPPING_THRESHOLD } from '@/lib/config';
 
 export default function CartPage() {
   const { items, loading, subtotal, updateQuantity, removeItem } = useCart();
@@ -102,7 +103,7 @@ export default function CartPage() {
               <span>{shipping === 0 ? 'Gratis' : `$${shipping.toFixed(2)}`}</span>
             </div>
             {shipping > 0 && (
-              <p className="text-xs text-ink-400">Agrega ${(99 - subtotal).toFixed(2)} más para envío gratis</p>
+              <p className="text-xs text-ink-400">Agrega ${(FREE_SHIPPING_THRESHOLD - subtotal).toFixed(2)} más para envío gratis</p>
             )}
             <div className="border-t border-ink-100 pt-3">
               <div className="flex justify-between text-base font-bold text-ink-950">
