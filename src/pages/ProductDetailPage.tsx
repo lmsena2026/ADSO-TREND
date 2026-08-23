@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
 import { useToast } from '@/contexts/ToastContext';
 import type { Product, Review, SizeGuide } from '@/types';
+import { FREE_SHIPPING_THRESHOLD } from '@/lib/config';
 import ProductCard from '@/components/ProductCard';
 import Rating from '@/components/Rating';
 
@@ -333,7 +334,7 @@ export default function ProductDetailPage() {
             {/* Trust badges */}
             <div className="mt-8 grid grid-cols-3 gap-4 border-t border-ink-100 pt-6">
               {[
-                { icon: Truck, label: 'Envío gratis +$99' },
+                { icon: Truck, label: `Envío gratis +$${FREE_SHIPPING_THRESHOLD}` },
                 { icon: RefreshCw, label: '30 días devolución' },
                 { icon: Shield, label: 'Pago seguro' },
               ].map((b) => (
