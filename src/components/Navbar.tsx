@@ -3,6 +3,7 @@ import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { Search, Heart, ShoppingBag, User, Menu, X, LayoutDashboard } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
+import { FREE_SHIPPING_THRESHOLD } from '@/lib/config';
 
 const navLinks = [
   { label: 'Hombre', to: '/catalogo?categoria=hombre' },
@@ -47,7 +48,7 @@ export default function Navbar() {
     <>
       {/* Announcement bar */}
       <div className="bg-ink-950 px-4 py-2 text-center text-xs font-medium uppercase tracking-wider text-white">
-        Envío gratis en pedidos superiores a $99 · Devoluciones gratuitas en 30 días
+        Envío gratis en pedidos superiores a ${FREE_SHIPPING_THRESHOLD} · Devoluciones gratuitas en 30 días
       </div>
 
       <header
