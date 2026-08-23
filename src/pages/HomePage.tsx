@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Sparkles, TrendingUp, Shirt, Tag } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import type { Product, Category, Outfit } from '@/types';
+import { FREE_SHIPPING_THRESHOLD } from '@/lib/config';
 import ProductCard from '@/components/ProductCard';
 
 export default function HomePage() {
@@ -259,7 +260,7 @@ export default function HomePage() {
       <section className="border-t border-ink-100 py-16">
         <div className="mx-auto grid max-w-7xl grid-cols-1 gap-8 px-4 md:grid-cols-3 lg:px-8">
           {[
-            { icon: '🚚', title: 'Envío gratis', desc: 'En pedidos superiores a $99' },
+            { icon: '🚚', title: 'Envío gratis', desc: `En pedidos superiores a $${FREE_SHIPPING_THRESHOLD}` },
             { icon: '↩️', title: 'Devoluciones', desc: '30 días para devoluciones gratuitas' },
             { icon: '🔒', title: 'Pago seguro', desc: 'Transacciones 100% protegidas' },
           ].map((f) => (
