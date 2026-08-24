@@ -5,7 +5,9 @@ import { supabase } from '@/lib/supabase';
 import type { Product, Category } from '@/types';
 import ProductCard from '@/components/ProductCard';
 
-const ALL_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'Única'];
+// Orden preferido para tallas de letra conocidas; cualquier otra talla (numérica, de zapato, etc.)
+// se añade automáticamente al final, ordenada de menor a mayor.
+const KNOWN_SIZE_ORDER = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL', 'Única'];
 const ALL_COLORS = ['Negro', 'Blanco', 'Gris', 'Beige', 'Azul', 'Rojo', 'Verde oliva', 'Camel', 'Grafito', 'Crema', 'Burdeos', 'Rosa', 'Marrón', 'Tortuga', 'Dorado', 'Oro', 'Plata', 'Arena', 'Negro'];
 
 export default function CatalogPage() {
@@ -33,6 +35,22 @@ export default function CatalogPage() {
       setLoading(false);
     })();
   }, []);
+
+  const allSizes = useMemo(() => {
+    const uniqueSizes = new Set<string>();
+    products.forEach((p) => p.sizes.forEach((s) => uniqueSizes.add(s)));
+    return Array.from(uniqueSizes).sort((a, b) => {
+      const iA = KNOWN_SIZE_ORDER.indexOf(a);
+      const iB = KNOWN_SIZE_ORDER.indexOf(b);
+      if (iA !== -1 && iB !== -1) return iA - iB; // ambas son tallas de letra conocidas
+      if (iA !== -1) return -1; // las tallas de letra van antes que las numéricas
+      if (iB !== -1) return 1;
+      const nA = Number(a);
+      const nB = Number(b);
+      if (!isNaN(nA) && !isNaN(nB)) return nA - nB; // tallas numéricas ordenadas de menor a mayor
+      return a.localeCompare(b);
+    });
+  }, [products]);
 
   const filtered = useMemo(() => {
     let result = [...products];
@@ -132,6 +150,7 @@ export default function CatalogPage() {
         {/* Desktop filters */}
         <aside className="hidden w-64 shrink-0 lg:block">
           <FilterContent
+            allSizes={allSizes}
             priceRange={priceRange}
             setPriceRange={setPriceRange}
             selectedSizes={selectedSizes}
@@ -200,6 +219,7 @@ export default function CatalogPage() {
               </button>
             </div>
             <FilterContent
+              allSizes={allSizes}
               priceRange={priceRange}
               setPriceRange={setPriceRange}
               selectedSizes={selectedSizes}
@@ -215,6 +235,7 @@ export default function CatalogPage() {
 }
 
 function FilterContent({
+  allSizes,
   priceRange,
   setPriceRange,
   selectedSizes,
@@ -222,6 +243,7 @@ function FilterContent({
   toggleSize,
   toggleColor,
 }: {
+  allSizes: string[];
   priceRange: [number, number];
   setPriceRange: (v: [number, number]) => void;
   selectedSizes: string[];
@@ -264,7 +286,7 @@ function FilterContent({
       <div>
         <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-ink-900">Talla</h3>
         <div className="flex flex-wrap gap-2">
-          {ALL_SIZES.map((s) => (
+          {allSizes.map((s) => (
             <button
               key={s}
               onClick={() => toggleSize(s)}
