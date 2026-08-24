@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Sparkles, TrendingUp, Shirt, Tag } from 'lucide-react';
+import { ArrowRight, ChevronLeft, ChevronRight, Sparkles, TrendingUp, Shirt, Tag } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import type { Product, Category, Outfit } from '@/types';
 import { FREE_SHIPPING_THRESHOLD } from '@/lib/config';
-import ProductCard from '@/components/ProductCard';
+import ProductCarousel from '@/components/ProductCarousel';
 
 export default function HomePage() {
   const [featured, setFeatured] = useState<Product[]>([]);
@@ -14,6 +14,14 @@ export default function HomePage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [outfits, setOutfits] = useState<Outfit[]>([]);
   const [loading, setLoading] = useState(true);
+  const categoriesScrollRef = useRef<HTMLDivElement>(null);
+
+  const scrollCategories = (direction: 'left' | 'right') => {
+    const el = categoriesScrollRef.current;
+    if (!el) return;
+    const amount = el.clientWidth * 0.8;
+    el.scrollBy({ left: direction === 'left' ? -amount : amount, behavior: 'smooth' });
+  };
 
   useEffect(() => {
     (async () => {
@@ -79,16 +87,35 @@ export default function HomePage() {
             <h2 className="section-title">Categorías</h2>
             <p className="mt-2 text-ink-500">Explora por categoría y encuentra tu look</p>
           </div>
-          <Link to="/catalogo" className="hidden items-center gap-1.5 text-sm font-medium text-ink-700 hover:text-ink-950 sm:flex">
-            Ver todo <ArrowRight className="h-4 w-4" />
-          </Link>
+          <div className="hidden items-center gap-2 sm:flex">
+            <button
+              onClick={() => scrollCategories('left')}
+              aria-label="Categorías anteriores"
+              className="rounded-full border border-ink-200 p-2 text-ink-700 transition-colors hover:bg-ink-100"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+            <button
+              onClick={() => scrollCategories('right')}
+              aria-label="Categorías siguientes"
+              className="rounded-full border border-ink-200 p-2 text-ink-700 transition-colors hover:bg-ink-100"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
+            <Link to="/catalogo" className="ml-2 flex items-center gap-1.5 text-sm font-medium text-ink-700 hover:text-ink-950">
+              Ver todo <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
         </div>
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
+        <div
+          ref={categoriesScrollRef}
+          className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        >
           {categories.map((cat) => (
             <Link
               key={cat.id}
               to={`/catalogo?categoria=${cat.slug}`}
-              className="group relative aspect-[3/4] overflow-hidden rounded-xl bg-ink-100"
+              className="group relative aspect-[3/4] w-[45%] shrink-0 snap-start overflow-hidden rounded-xl bg-ink-100 sm:w-[30%] lg:w-[19%]"
             >
               <img
                 src={cat.image_url ?? ''}
@@ -106,6 +133,9 @@ export default function HomePage() {
             </Link>
           ))}
         </div>
+        <Link to="/catalogo" className="mt-4 flex items-center gap-1.5 text-sm font-medium text-ink-700 hover:text-ink-950 sm:hidden">
+          Ver todo <ArrowRight className="h-4 w-4" />
+        </Link>
       </section>
 
       {/* FEATURED */}
@@ -122,19 +152,7 @@ export default function HomePage() {
               Ver todo <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
-          {loading ? (
-            <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-              {Array.from({ length: 8 }).map((_, i) => (
-                <div key={i} className="aspect-[3/4] rounded-xl skeleton" />
-              ))}
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-              {featured.map((p) => (
-                <ProductCard key={p.id} product={p} />
-              ))}
-            </div>
-          )}
+          <ProductCarousel products={featured} loading={loading} />
         </div>
       </section>
 
@@ -171,11 +189,7 @@ export default function HomePage() {
             <h2 className="section-title">Lo más popular ahora</h2>
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-          {trending.map((p) => (
-            <ProductCard key={p.id} product={p} />
-          ))}
-        </div>
+        <ProductCarousel products={trending} loading={loading} />
       </section>
 
       {/* OUTFITS */}
@@ -228,11 +242,7 @@ export default function HomePage() {
             Ver todo <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-          {newArrivals.map((p) => (
-            <ProductCard key={p.id} product={p} />
-          ))}
-        </div>
+        <ProductCarousel products={newArrivals} loading={loading} />
       </section>
 
       {/* OFFERS */}
@@ -247,11 +257,7 @@ export default function HomePage() {
                 <h2 className="section-title">Aprovecha antes de que se agote</h2>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-              {offers.map((p) => (
-                <ProductCard key={p.id} product={p} />
-              ))}
-            </div>
+            <ProductCarousel products={offers} loading={loading} />
           </div>
         </section>
       )}
