@@ -4,6 +4,13 @@ import { supabase } from '@/lib/supabase';
 import type { Product, Category } from '@/types';
 import { useToast } from '@/contexts/ToastContext';
 
+const STYLE_OPTIONS = [
+  { id: 'urbano', label: 'Urbano' },
+  { id: 'casual', label: 'Casual' },
+  { id: 'elegante', label: 'Elegante' },
+  { id: 'deportivo', label: 'Deportivo' },
+];
+
 const emptyForm = {
   name: '',
   slug: '',
@@ -15,7 +22,7 @@ const emptyForm = {
   sizes: '',
   colors: '',
   stock: '',
-  style_tags: '',
+  style_tags: [] as string[],
   is_featured: false,
   is_new: false,
   is_trending: false,
@@ -53,6 +60,10 @@ export default function AdminProducts() {
     return Number(digits).toLocaleString('es-CO');
   };
 
+  // Normaliza un color para que siempre quede igual sin importar cómo lo escriban
+  // (ej: "NEGRO", "negro", "NeGrO" -> "Negro")
+  const normalizeColor = (c: string) => c.trim().charAt(0).toUpperCase() + c.trim().slice(1).toLowerCase();
+
   const openNew = () => {
     setForm({ ...emptyForm });
     setEditingId(null);
@@ -71,7 +82,7 @@ export default function AdminProducts() {
       sizes: p.sizes.join(', '),
       colors: p.colors.join(', '),
       stock: String(p.stock),
-      style_tags: p.style_tags.join(', '),
+      style_tags: p.style_tags,
       is_featured: p.is_featured,
       is_new: p.is_new,
       is_trending: p.is_trending,
@@ -94,9 +105,9 @@ export default function AdminProducts() {
       category_id: form.category_id || null,
       images: form.images.split('\n').map((s) => s.trim()).filter(Boolean),
       sizes: form.sizes.split(',').map((s) => s.trim()).filter(Boolean),
-      colors: form.colors.split(',').map((s) => s.trim()).filter(Boolean),
+      colors: form.colors.split(',').map((s) => s.trim()).filter(Boolean).map(normalizeColor),
       stock: Number(form.stock) || 0,
-      style_tags: form.style_tags.split(',').map((s) => s.trim()).filter(Boolean),
+      style_tags: form.style_tags,
       is_featured: form.is_featured,
       is_new: form.is_new,
       is_trending: form.is_trending,
@@ -278,8 +289,27 @@ export default function AdminProducts() {
                 <input className="input-field" value={form.colors} onChange={(e) => setForm({ ...form, colors: e.target.value })} placeholder="Negro, Blanco" />
               </div>
               <div className="sm:col-span-2">
-                <label className="mb-1 block text-sm font-medium text-ink-700">Etiquetas de estilo (coma)</label>
-                <input className="input-field" value={form.style_tags} onChange={(e) => setForm({ ...form, style_tags: e.target.value })} placeholder="urbano, casual" />
+                <label className="mb-1 block text-sm font-medium text-ink-700">Estilo</label>
+                <div className="flex flex-wrap gap-4">
+                  {STYLE_OPTIONS.map((s) => (
+                    <label key={s.id} className="flex items-center gap-2 text-sm font-medium text-ink-700">
+                      <input
+                        type="checkbox"
+                        checked={form.style_tags.includes(s.id)}
+                        onChange={(e) =>
+                          setForm({
+                            ...form,
+                            style_tags: e.target.checked
+                              ? [...form.style_tags, s.id]
+                              : form.style_tags.filter((t) => t !== s.id),
+                          })
+                        }
+                        className="h-4 w-4 accent-ink-950"
+                      />
+                      {s.label}
+                    </label>
+                  ))}
+                </div>
               </div>
               <div className="flex flex-wrap gap-4 sm:col-span-2">
                 {[
