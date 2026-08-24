@@ -77,7 +77,8 @@ export default function CatalogPage() {
     }
 
     if (selectedColors.length > 0) {
-      result = result.filter((p) => p.colors.some((c) => selectedColors.includes(c)));
+      const selectedLower = selectedColors.map((c) => c.toLowerCase());
+      result = result.filter((p) => p.colors.some((c) => selectedLower.includes(c.toLowerCase())));
     }
 
     switch (sortBy) {
